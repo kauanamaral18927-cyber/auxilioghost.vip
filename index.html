@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Ghost Sensi</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+<style>
+* {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+*:focus,
+*:active {
+  outline: none;
+  box-shadow: none;
+}
+* {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+:root{--glass:rgba(15,15,18,.78);--border:rgba(255,255,255,.12);}
+*{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+body{margin:0;background:#000;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#fff}
+canvas{position:fixed;inset:0;z-index:0}
+.wrapper{position:relative}
+.panel{position:relative;z-index:1;width:min(420px,90vw);aspect-ratio:1/1;background:var(--glass);backdrop-filter:blur(22px);border-radius:26px;border:1px solid var(--border);box-shadow:0 0 80px rgba(255,255,255,.08);padding:20px;display:flex;flex-direction:column}
+.header-box{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.35);margin-bottom:14px}
+;background-size:cover;background-position:center;box-shadow:0 0 16px rgba(255,255,255,.15)}
+.title{font-weight:600;font-size:15px;letter-spacing:.3px;opacity:.95;animation:glow 3s ease-in-out infinite;display:flex;align-items:center;gap:8px}
+@keyframes glow{0%{text-shadow:0 0 2px rgba(255,255,255,.15)}50%{text-shadow:0 0 8px rgba(255,255,255,.35)}100%{text-shadow:0 0 2px rgba(255,255,255,.15)}}
+.upload{margin-top:10px;border:2px dashed #333;border-radius:16px;padding:18px;text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+button.inject{margin-top:14px;padding:12px;border-radius:12px;border:none;background:#e6e6e6;color:#000;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.logs-box{margin-top:14px;flex:1;border-radius:14px;box-shadow:0 0 25px rgba(255,255,255,.18), inset 0 0 0 1px rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.success{display:none;font-weight:500;font-size:13px;letter-spacing:.2px;opacity:.9}
+.open-btn{
+  margin-top:14px;width:100%;padding:12px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.2);
+  background:rgba(0,0,0,.65);color:#fff;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:.25s; pointer-events:none; filter:blur(.6px); opacity:.6;
+}
+.open-btn.enabled{pointer-events:auto; filter:none; opacity:1}
+
+.frozen {
+  filter: saturate(.9);
+}
+
+.frozen * {
+  pointer-events: none;
+}
+.frozen .open-btn {
+  pointer-events: auto;
+}
+
+
+</style>
+</head>
+
+<body>
+<canvas id="bg"></canvas>
+
+<div class="wrapper">
+  <div class="panel">
+    <div class="header-box">
+      <div class="avatar"></div>
+      <div class="title"><i class="ph ph-shield-check"></i> AIMBOT FULL</div>
+    </div>
+
+    <div class="upload" onclick="fileInput.click()">
+      <i class="ph ph-folder-open"></i> Selecione o arquivo headtrick:
+    </div>
+    <input type="file" id="fileInput" accept=".headtrick" hidden>
+
+    <button class="inject" onclick="startInject()">
+      <i class="ph ph-play"></i> Realizar injeção!
+    </button>
+
+    <div class="logs-box">
+      <div class="spinner" id="spinner"></div>
+      <div class="success" id="success">O headtrick foi injetado, tenha um bom jogo.</div>
+    </div>
+
+    <button class="open-btn" id="openFF" onclick="openFreeFire()">
+      <i class="ph ph-game-controller"></i> Abrir
+    </button>
+  </div>
+</div>
+
+<script>
+let fileSelected=false;
+const fileInput=document.getElementById('fileInput');
+const spinner=document.getElementById('spinner');
+const success=document.getElementById('success');
+const openBtn=document.getElementById('openFF');
+
+fileInput.addEventListener('change',()=>{
+  fileSelected = fileInput.files.length && fileInput.files[0].name.endsWith('.headtrick');
+});
+
+function startInject(){
+  if(!fileSelected) return;
+  success.style.display='none';
+  spinner.style.display='block';
+  openBtn.classList.remove('enabled');
+  setTimeout(()=>{
+    spinner.style.display='none';
+    success.style.display='block';
+    openBtn.classList.add('enabled');
+    document.querySelector('.panel').classList.add('frozen');
+  },2000);
+}
+
+function openFreeFire(){
+  if(!openBtn.classList.contains('enabled')) return;
+  window.location.href='freefire://';
+}
+
+// Canvas rápido e denso
+const c=document.getElementById('bg'),ctx=c.getContext('2d');
+let points=[];
+function resize(){
+  const dpr=window.devicePixelRatio||1;
+  c.width=innerWidth*dpr;
+  c.height=innerHeight*dpr;
+  c.style.width=innerWidth+'px';
+  c.style.height=innerHeight+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const count=Math.min(260,Math.floor((innerWidth*innerHeight)/9000));
+  points=[...Array(count)].map(()=>({
+    x:Math.random()*innerWidth,
+    y:Math.random()*innerHeight,
+    vx:(Math.random()-.5)*1.8,
+    vy:(Math.random()-.5)*1.8
+  }));
+}
+onresize=resize;resize();
+(function draw(){
+  ctx.clearRect(0,0,innerWidth,innerHeight);
+  for(let i=0;i<points.length;i++){
+    const a=points[i];
+    a.x+=a.vx;a.y+=a.vy;
+    if(a.x<0||a.x>innerWidth)a.vx*=-1;
+    if(a.y<0||a.y>innerHeight)a.vy*=-1;
+    for(let j=i+1;j<points.length;j++){
+      const b=points[j];
+      const d=Math.hypot(a.x-b.x,a.y-b.y);
+      if(d<180){
+        ctx.strokeStyle=`rgba(210,210,210,${(1-d/180)*0.45})`;
+        ctx.beginPath();
+        ctx.moveTo(a.x,a.y);
+        ctx.lineTo(b.x,b.y);
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
